@@ -99,7 +99,7 @@ class SignUp extends React.Component {
     );
   }
 
-formIsValid = () => this.state.password === this.state.passwordConfirmation;
+  formIsValid = () => this.state.password === this.state.passwordConfirmation;
 
   userTyping = (type, e) => {
     console.log(type, e);
@@ -115,45 +115,53 @@ formIsValid = () => this.state.password === this.state.passwordConfirmation;
           passwordConfirmation: e.target.value
         });
         break;
+      default:
+        break;
     }
   };
   handleSubmit = e => {
-      e.preventDefault();
+    e.preventDefault();
 
-      if(!this.formIsValid()) {
-          this.setState({
-              signUpError: "Password does not match"
-          })
-          return
-      }
-      console.log("Form is Valid: ",this.formIsValid)
-      firebase
+    if (!this.formIsValid()) {
+      this.setState({
+        signUpError: "Password does not match"
+      });
+      return;
+    }
+    console.log("Form is Valid: ", this.formIsValid);
+    firebase
       .auth()
-      .createUserWithEmailAndPassword(this.state.email,this.state.password)
-      .then(authres => {
-        const userObj = {
+      .createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then(
+        authres => {
+          const userObj = {
             email: authres.user.email
-        }
-        firebase.firestore()
-        .collection('users')
-        .doc(this.state.email)
-        .set(userObj)
-        .then( () => {
-            this.props.history.push('/dashboard')
-        },dberr => {
-            console.log(dberr)
-            this.setState({
-                signUpError: "Error adding user"
-            })
-        })
-      }, autherr => {
-        console.log(autherr)
-        this.setState({
+          };
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(this.state.email)
+            .set(userObj)
+            .then(
+              () => {
+                this.props.history.push("/dashboard");
+              },
+              dberr => {
+                console.log(dberr);
+                this.setState({
+                  signUpError: "Error adding user"
+                });
+              }
+            );
+        },
+        autherr => {
+          console.log(autherr);
+          this.setState({
             signUpError: "Error adding user"
-        })
-      })
-      
-    };
+          });
+        }
+      );
+  };
 }
 
 export default withStyles(styles)(SignUp);
