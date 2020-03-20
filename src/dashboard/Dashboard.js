@@ -1,6 +1,7 @@
 import React from "react";
 import ChatList from "../chatList/ChatList";
-import ChatView from '../chatView/ChatView'
+import ChatView from "../chatView/ChatView";
+import ChatTextBox from "../chatTextBox/ChatTextBox";
 
 import firebase from "firebase";
 import styles from "./Styles";
@@ -27,7 +28,15 @@ class Dashboard extends React.Component {
           userEmail={this.state.email}
           selectedChatIndex={this.state.selectedChat}
         ></ChatList>
-        <ChatView></ChatView>
+        {this.state.newChatFormVisible ? null : (
+          <ChatView
+            user={this.state.email}
+            chat={this.state.chats[this.state.selectedChat]}
+          ></ChatView>
+        )}
+        {this.state.selectedChat !== null && !this.state.newChatFormVisible ? (
+          <ChatTextBox submitMsgFn={this.submitMsg}></ChatTextBox>
+        ) : null}
         <Button onClick={this.signOut} className={classes.signOutBtn}>
           SignOut
         </Button>
@@ -39,8 +48,28 @@ class Dashboard extends React.Component {
     firebase.auth().signOut();
   };
 
+  submitMsg = (msg) => {
+      const docKey = this.buildDocKey(this.state.chats[this.state.selectedChat].users.filter(_usr => _usr !== this.state.email)[0]);
+      console.log("doc:",docKey)
+      firebase
+      .firestore()
+      .collection('chats')
+      .doc(docKey)
+      .update({
+          messages: firebase.firestore.FieldValue.arrayUnion({
+              message: msg,
+              sender: this.state.email,
+              timeStamp: Date.now()
+          }),
+          receiverHasRead: false
+      })
+  } 
+
+  buildDocKey = (friend) => [this.state.email,friend].sort().join(':')
+
   selectChat = chatIndex => {
     console.log("Chat selected", chatIndex);
+    this.setState({ selectedChat: chatIndex });
   };
 
   newChatBtnClick = () => {
