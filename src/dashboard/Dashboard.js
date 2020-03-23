@@ -35,7 +35,7 @@ class Dashboard extends React.Component {
           ></ChatView>
         )}
         {this.state.selectedChat !== null && !this.state.newChatFormVisible ? (
-          <ChatTextBox submitMsgFn={this.submitMsg}></ChatTextBox>
+          <ChatTextBox messageReadFn={this.messageRead} submitMsgFn={this.submitMsg}></ChatTextBox>
         ) : null}
         <Button onClick={this.signOut} className={classes.signOutBtn}>
           SignOut
@@ -48,29 +48,55 @@ class Dashboard extends React.Component {
     firebase.auth().signOut();
   };
 
-  submitMsg = (msg) => {
-      const docKey = this.buildDocKey(this.state.chats[this.state.selectedChat].users.filter(_usr => _usr !== this.state.email)[0]);
-      console.log("doc:",docKey)
-      firebase
+  submitMsg = msg => {
+    const docKey = this.buildDocKey(
+      this.state.chats[this.state.selectedChat].users.filter(
+        _usr => _usr !== this.state.email
+      )[0]
+    );
+    console.log("doc:", docKey);
+    firebase
       .firestore()
-      .collection('chats')
+      .collection("chats")
       .doc(docKey)
       .update({
-          messages: firebase.firestore.FieldValue.arrayUnion({
-              message: msg,
-              sender: this.state.email,
-              timeStamp: Date.now()
-          }),
-          receiverHasRead: false
-      })
-  } 
-
-  buildDocKey = (friend) => [this.state.email,friend].sort().join(':')
-
-  selectChat = chatIndex => {
-    console.log("Chat selected", chatIndex);
-    this.setState({ selectedChat: chatIndex });
+        messages: firebase.firestore.FieldValue.arrayUnion({
+          message: msg,
+          sender: this.state.email,
+          timeStamp: Date.now()
+        }),
+        receiverHasRead: false
+      });
   };
+
+  buildDocKey = friend => [this.state.email, friend].sort().join(":");
+
+  selectChat = async chatIndex => {
+    await this.setState({ selectedChat: chatIndex });
+    this.messageRead();
+  };
+
+  messageRead = () => {
+    const docKey = this.buildDocKey(
+      this.state.chats[this.state.selectedChat].users.filter(
+        _usr => _usr !== this.state.email
+      )[0]
+    );
+    if (this.clickedChatWhereNotSender(this.state.selectedChat)) {
+        console.log("No sender")
+      firebase
+        .firestore()
+        .collection("chats")
+        .doc(docKey)
+        .update({
+          receiverHasRead: true
+        });
+    } else {
+      console.log("User is sender");
+    }
+  };
+
+  clickedChatWhereNotSender = chatIndex => (this.state.chats[chatIndex].messages[this.state.chats[chatIndex].messages.length - 1].sender !== this.state.email);
 
   newChatBtnClick = () => {
     this.setState({ newChatFormVisible: true, selectedChat: null });

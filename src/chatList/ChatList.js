@@ -9,8 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import styles from "./Styles";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
-// import ListItemIcon from "@material-ui/core/ListItemIcon";
-// import NotificationImportant from "@material-ui/icons/NotificationImportant";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import NotificationImportant from "@material-ui/icons/NotificationImportant";
 
 class ChatList extends React.Component {
   render() {
@@ -61,6 +61,12 @@ class ChatList extends React.Component {
                         </React.Fragment>
                       }
                     ></ListItemText>
+                    {
+                      _chat.receiverHasRead === false && !this.userIsSender(_chat) ?
+                      <ListItemIcon>
+                        <NotificationImportant className={classes.unreadMessage}></NotificationImportant>
+                      </ListItemIcon> : null
+                    }
                   </ListItem>
                   <Divider></Divider>
                 </div>
@@ -90,6 +96,7 @@ class ChatList extends React.Component {
   selectChat = chatIndex => {
     this.props.selectChatFn(chatIndex);
   }
+  userIsSender = (chat) => chat.messages[chat.messages.length - 1].sender === this.props.userEmail; 
 }
 
 export default withStyles(styles)(ChatList);
