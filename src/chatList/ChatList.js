@@ -23,6 +23,7 @@ class ChatList extends React.Component {
             color="primary"
             variant="contained"
             className={classes.newChatBtn}
+            onClick={this.props.newChatBtnFn}
           >
             Start a new chat
           </Button>
@@ -83,6 +84,7 @@ class ChatList extends React.Component {
             color="primary"
             variant="contained"
             className={classes.newChatBtn}
+            onClick={this.props.newChatBtnFn}
           >
             Start a new chat
           </Button>
