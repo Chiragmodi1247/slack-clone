@@ -100,7 +100,7 @@ class Login extends React.Component {
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then(
         () => {
-          this.props.history.push("/dashboard");
+          this.props.history.push("/");
         },
         err => {
           this.setState({ loginError: true });

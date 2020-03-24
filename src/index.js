@@ -26,7 +26,7 @@ const Routing = (
         <div id='routing-container'>
             <Route path='/login' component={Login}></Route>
             <Route path='/signup' component={SignUp}></Route>
-            <Route path='/dashboard' component={Dashboard}></Route>
+            <Route path='/' exact component={Dashboard}></Route>
         </div>
     </Router>
 )

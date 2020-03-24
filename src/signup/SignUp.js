@@ -144,7 +144,7 @@ class SignUp extends React.Component {
             .set(userObj)
             .then(
               () => {
-                this.props.history.push("/dashboard");
+                this.props.history.push("/");
               },
               dberr => {
                 console.log(dberr);
