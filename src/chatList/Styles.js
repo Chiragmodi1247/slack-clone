@@ -4,7 +4,7 @@ const styles = theme => ({
     height: "calc(100% - 35px)",
     position: "absolute",
     left: "0",
-    width: "300px",
+    width: '20vW',
     boxShadow: "0px 0px 2px black"
   },
   listItem: {

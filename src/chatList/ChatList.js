@@ -27,7 +27,9 @@ class ChatList extends React.Component {
           >
             Start a new chat
           </Button>
+          
           <List>
+            
             {this.props.chats.map((_chat, _index) => {
               return (
                 <div key={_index}>
@@ -37,6 +39,7 @@ class ChatList extends React.Component {
                     selected={this.props.selectedChatIndex === _index}
                     alignItems="flex-start"
                   >
+                    
                     <ListItemAvatar>
                       <Avatar alt="remy">
                         {
@@ -62,12 +65,14 @@ class ChatList extends React.Component {
                         </React.Fragment>
                       }
                     ></ListItemText>
-                    {
-                      _chat.receiverHasRead === false && !this.userIsSender(_chat) ?
+                    {_chat.receiverHasRead === false &&
+                    !this.userIsSender(_chat) ? (
                       <ListItemIcon>
-                        <NotificationImportant className={classes.unreadMessage}></NotificationImportant>
-                      </ListItemIcon> : null
-                    }
+                        <NotificationImportant
+                          className={classes.unreadMessage}
+                        ></NotificationImportant>
+                      </ListItemIcon>
+                    ) : null}
                   </ListItem>
                   <Divider></Divider>
                 </div>
@@ -97,8 +102,10 @@ class ChatList extends React.Component {
   };
   selectChat = chatIndex => {
     this.props.selectChatFn(chatIndex);
+  };
+  userIsSender = chat =>
+    chat.messages[chat.messages.length - 1].sender === this.props.userEmail;
+
   }
-  userIsSender = (chat) => chat.messages[chat.messages.length - 1].sender === this.props.userEmail; 
-}
 
 export default withStyles(styles)(ChatList);

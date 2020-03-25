@@ -3,6 +3,7 @@ import ChatList from "../chatList/ChatList";
 import ChatView from "../chatView/ChatView";
 import ChatTextBox from "../chatTextBox/ChatTextBox";
 import NewChat from '../newChat/NewChat'
+import ToDoView from '../ToDoList/ToDoView'
 
 import firebase from "firebase";
 import styles from "./Styles";
@@ -14,7 +15,8 @@ class Dashboard extends React.Component {
       selectedChat: 0,
       newChatFormVisible: false,
       email: null,
-      chats: []
+      chats: [],
+      ToDoList: []
     };
   }
   render() {
@@ -35,6 +37,7 @@ class Dashboard extends React.Component {
             chat={this.state.chats[this.state.selectedChat]}
           ></ChatView>
         )}
+        <ToDoView user={this.state.email} ToDoList={this.state.ToDoList}></ToDoView>
         {this.state.selectedChat !== null && !this.state.newChatFormVisible ? (
           <ChatTextBox messageReadFn={this.messageRead} submitMsgFn={this.submitMsg}></ChatTextBox>
         ) : null}
@@ -59,7 +62,6 @@ class Dashboard extends React.Component {
         _usr => _usr !== this.state.email
       )[0]
     );
-    console.log("doc:", docKey);
     firebase
       .firestore()
       .collection("chats")
@@ -145,6 +147,16 @@ class Dashboard extends React.Component {
             await this.setState({
               email: _usr.email,
               chats: chats
+            });
+          });
+          await firebase
+          .firestore()
+          .collection("todo")
+          .where("user", "==", _usr.email)
+          .onSnapshot(async res => {
+            const ToDoListDoc = res.docs.map(_doc => _doc.data());
+            await this.setState({
+              ToDoList: ToDoListDoc[0].todolist
             });
             console.log(this.state);
           });

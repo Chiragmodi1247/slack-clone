@@ -11,14 +11,14 @@ const styles = theme => ({
     chatTextBoxContainer: {
       position: 'absolute',
       bottom: '15px',
-      left: '315px',
+      left: '21vW',
       boxSizing: 'border-box',
       overflow: 'auto',
       width: 'calc(100% - 300px - 50px)'
     },
   
     chatTextBox: {
-      width: 'calc(100% - 25px)'
+      width: '56vW'
     }
   
   });
