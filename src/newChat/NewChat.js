@@ -11,7 +11,7 @@ import {
   Button
 } from "@material-ui/core";
 
-import firebase from 'firebase'
+import firebase from "firebase";
 
 class NewChat extends React.Component {
   constructor() {
@@ -19,7 +19,8 @@ class NewChat extends React.Component {
     this.state = {
       username: null,
       message: null,
-      serverError: false
+      serverError: false,
+      overSmart: false
     };
   }
   render() {
@@ -31,6 +32,15 @@ class NewChat extends React.Component {
           <Typography component="h1" variant="h5">
             Send A Message!
           </Typography>
+          {this.state.overSmart ? (
+            <Typography
+              component="h5"
+              variant="h6"
+              className={classes.errorText}
+            >
+              Get a job in QA
+            </Typography>
+          ) : null}
           <form className={classes.form} onSubmit={e => this.submitNewChat(e)}>
             <FormControl fullWidth>
               <InputLabel htmlFor="new-chat-username">
@@ -96,38 +106,46 @@ class NewChat extends React.Component {
 
   submitNewChat = async e => {
     e.preventDefault();
-    const userExists = await this.userExists();
-    if(userExists) {
-        const chatExists = await this.chatExists();
-        chatExists ? this.goToChat() : this.createNewChat();
+
+    if(this.state.username === this.props.userEmail){
+      this.setState({overSmart: true,serverError: false})
+      return
     }
-    else{
-        this.setState({serverError:true})
+    const userExists = await this.userExists();
+    if (userExists) {
+      const chatExists = await this.chatExists();
+      chatExists ? this.goToChat() : this.createNewChat();
+    } else {
+      this.setState({ serverError: true, overSmart: false });
     }
   };
 
   createNewChat = () => {
-      this.props.newChatSubmitFn({
-          sendTo: this.state.username,
-          message: this.state.message
-      })
-  }
+    this.props.newChatSubmitFn({
+      sendTo: this.state.username,
+      message: this.state.message
+    });
+  };
 
-  goToChat = () => this.props.goToChatFn(this.buildDocKey(),this.state.message)  
+  goToChat = () =>
+    this.props.goToChatFn(this.buildDocKey(), this.state.message);
 
   buildDocKey = () => {
-      return [firebase.auth().currentUser.email,this.state.username].sort().join(':')
-  }
+    return [firebase.auth().currentUser.email, this.state.username]
+      .sort()
+      .join(":");
+  };
 
   chatExists = async () => {
     const docKey = this.buildDocKey();
-    const chat = await firebase.firestore()
-    .collection('chats')
-    .doc(docKey)
-    .get()
-    console.log(chat.exists)
-    return chat.exists
-  } 
+    const chat = await firebase
+      .firestore()
+      .collection("chats")
+      .doc(docKey)
+      .get();
+    console.log(chat.exists);
+    return chat.exists;
+  };
 
   userExists = async () => {
     const userSnapshot = await firebase
@@ -138,7 +156,7 @@ class NewChat extends React.Component {
       .map(_doc => _doc.data().email)
       .includes(this.state.username);
 
-      return exists;
+    return exists;
   };
 }
 
