@@ -8,7 +8,7 @@ const styles = theme => ({
     boxShadow: "0px 0px 2px black"
   },
   listItem: {
-    cursor: "pointer"
+    cursor: "pointer",
   },
   newChatBtn: {
     borderRadius: "0px"

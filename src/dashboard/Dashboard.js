@@ -2,8 +2,8 @@ import React from "react";
 import ChatList from "../chatList/ChatList";
 import ChatView from "../chatView/ChatView";
 import ChatTextBox from "../chatTextBox/ChatTextBox";
-import NewChat from '../newChat/NewChat'
-import ToDoView from '../ToDoList/ToDoView'
+import NewChat from "../newChat/NewChat";
+import ToDoView from "../ToDoList/ToDoView";
 
 import firebase from "firebase";
 import styles from "./Styles";
@@ -37,14 +37,19 @@ class Dashboard extends React.Component {
             chat={this.state.chats[this.state.selectedChat]}
           ></ChatView>
         )}
-        <ToDoView user={this.state.email} ToDoList={this.state.ToDoList}></ToDoView>
+        <ToDoView user={this.state.email}></ToDoView>
         {this.state.selectedChat !== null && !this.state.newChatFormVisible ? (
-          <ChatTextBox messageReadFn={this.messageRead} submitMsgFn={this.submitMsg}></ChatTextBox>
+          <ChatTextBox
+            messageReadFn={this.messageRead}
+            submitMsgFn={this.submitMsg}
+          ></ChatTextBox>
         ) : null}
-        {
-            this.state.newChatFormVisible ? 
-            <NewChat goToChatFn={this.goToChat} newChatSubmitFn={this.newChatSubmit}></NewChat> : null
-        }
+        {this.state.newChatFormVisible ? (
+          <NewChat
+            goToChatFn={this.goToChat}
+            newChatSubmitFn={this.newChatSubmit}
+          ></NewChat>
+        ) : null}
         <Button onClick={this.signOut} className={classes.signOutBtn}>
           SignOut
         </Button>
@@ -90,7 +95,7 @@ class Dashboard extends React.Component {
       )[0]
     );
     if (this.clickedChatWhereNotSender(this.state.selectedChat)) {
-        console.log("No sender")
+      console.log("No sender");
       firebase
         .firestore()
         .collection("chats")
@@ -103,38 +108,45 @@ class Dashboard extends React.Component {
     }
   };
 
-  clickedChatWhereNotSender = chatIndex => (this.state.chats[chatIndex].messages[this.state.chats[chatIndex].messages.length - 1].sender !== this.state.email);
+  clickedChatWhereNotSender = chatIndex =>
+    this.state.chats[chatIndex].messages[
+      this.state.chats[chatIndex].messages.length - 1
+    ].sender !== this.state.email;
 
   newChatBtnClick = () => {
     this.setState({ newChatFormVisible: true, selectedChat: null });
   };
 
-  goToChat = async (docKey,msg) => {
-    const usersInChat = docKey.split(':')
-    const chat = this.state.chats.find(_chat => usersInChat.every(_user => _chat.users.include(_user)))
-    this.setState({newChatFormVisible: false})
-    await this.selectChat(this.state.chats.indexOf(chat))
-    this.submitMsg(msg)
-  }
+  goToChat = async (docKey, msg) => {
+    const usersInChat = docKey.split(":");
+    const chat = this.state.chats.find(_chat =>
+      usersInChat.every(_user => _chat.users.include(_user))
+    );
+    this.setState({ newChatFormVisible: false });
+    await this.selectChat(this.state.chats.indexOf(chat));
+    this.submitMsg(msg);
+  };
 
-  newChatSubmit = async (chatObj) => {
-    const docKey = this.buildDocKey(chatObj.sendTo)
-    await firebase.firestore()
-    .collection('chats')
-    .doc(docKey)
-    .set({
-      receiverHasRead: false,
-      users: [this.state.email, chatObj.sendTo],
-      messages: [{
-        message: chatObj.message,
-        sender: this.state.email
-      }]
-    })
-    this.setState({ newChatFormVisible: false})
-    this.selectChat(this.state.chats.length - 1)
-  }
-
-  componentDidMount = () => {
+  newChatSubmit = async chatObj => {
+    const docKey = this.buildDocKey(chatObj.sendTo);
+    await firebase
+      .firestore()
+      .collection("chats")
+      .doc(docKey)
+      .set({
+        receiverHasRead: false,
+        users: [this.state.email, chatObj.sendTo],
+        messages: [
+          {
+            message: chatObj.message,
+            sender: this.state.email
+          }
+        ]
+      });
+    this.setState({ newChatFormVisible: false });
+    this.selectChat(this.state.chats.length - 1);
+  };
+  componentWillMount = () => {
     firebase.auth().onAuthStateChanged(async _usr => {
       if (!_usr) this.props.history.push("/login");
       else {
@@ -148,17 +160,6 @@ class Dashboard extends React.Component {
               email: _usr.email,
               chats: chats
             });
-          });
-          await firebase
-          .firestore()
-          .collection("todo")
-          .where("user", "==", _usr.email)
-          .onSnapshot(async res => {
-            const ToDoListDoc = res.docs.map(_doc => _doc.data());
-            await this.setState({
-              ToDoList: ToDoListDoc[0].todolist
-            });
-            console.log(this.state);
           });
       }
     });

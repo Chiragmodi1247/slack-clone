@@ -30,6 +30,7 @@ class Login extends React.Component {
           <Typography component="h1" variant="h5">
             Login
           </Typography>
+           <span className={classes.errorText}>*All previous user are deleted, so you might have to create a new</span>
           <form onSubmit={e => this.handleSubmit(e)} className={classes.form}>
             <FormControl required fullWidth margin="normal">
               <InputLabel htmlFor="login-email-input">

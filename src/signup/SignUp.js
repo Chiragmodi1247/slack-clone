@@ -128,7 +128,6 @@ class SignUp extends React.Component {
       });
       return;
     }
-    console.log("Form is Valid: ", this.formIsValid);
     firebase
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -137,6 +136,10 @@ class SignUp extends React.Component {
           const userObj = {
             email: authres.user.email
           };
+          const todoObj = {
+            todolist: [],
+            user: authres.user.email
+          }
           firebase
             .firestore()
             .collection("users")
@@ -144,7 +147,13 @@ class SignUp extends React.Component {
             .set(userObj)
             .then(
               () => {
-                this.props.history.push("/");
+                firebase
+                .firestore()
+                .collection("todo")
+                .doc(this.state.email)
+                .set(todoObj)
+                .then( () => this.props.history.push("/")
+                )
               },
               dberr => {
                 console.log(dberr);

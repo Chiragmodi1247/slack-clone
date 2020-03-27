@@ -17,13 +17,18 @@ const styles = theme => ({
       color: "gray"
     }
   },
-
-  form: {
-    width: "100%",
-    marginTop: theme.spacing()
+  delete: {
+    color: "red",
+    cursor: "pointer"
   },
   listItem: {
-    cursor: "pointer"
+    padding: '5px',
+    marginTop: '10px',
+    borderRadius: '10px',
+    border: '1px solid black'
+  },
+  todoheader: {
+    marginTop: '10px'
   },
 
   ToDoTextBox: {
