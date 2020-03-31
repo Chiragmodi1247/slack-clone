@@ -3,22 +3,46 @@ import styles from "./Styles";
 import { withStyles } from "@material-ui/core";
 
 class ChatView extends React.Component {
-
-    componentDidUpdate = () => {
-        const container = document.getElementById('chatview-container')
-        if(container)
-        container.scrollTo(0 , container.scrollHeight)
-    }
+  componentDidUpdate = () => {
+    const container = document.getElementById("chatview-container");
+    if (container) container.scrollTo(0, container.scrollHeight);
+  };
 
   render() {
-    const { classes, chat, user } = this.props;
-    if (chat === undefined) {
-      return <main id='chatview-container' className={classes.content}></main>;
-    } else {
+    const { classes, chat, user, groupChat, isChat } = this.props;
+    if (groupChat !== undefined && !isChat) {
       return (
         <div>
-          <div className={classes.chatHeader}>Your conversation with {chat.users.filter(_usr => _usr !== user)[0]}</div>
-          <main id='chatview-container' className={classes.content}>
+          <div className={classes.chatHeader}>{groupChat.name}</div>
+          <main id="chatview-container" className={classes.content}>
+            {groupChat.messages.map((_msg, _index) => {
+              return (
+                <div key={_index}>
+                  {_msg.sender === user ? null : (
+                    <div className={classes.userSentGrp}>{_msg.sender}</div>
+                  )}
+                  <div
+                    className={
+                      _msg.sender === user
+                        ? classes.friendSentGrpMsg
+                        : classes.userSentGrpMsg
+                    }
+                  >
+                    {_msg.message}
+                  </div>
+                </div>
+              );
+            })}
+          </main>
+        </div>
+      );
+    } else if (chat !== undefined && isChat) {
+      return (
+        <div>
+          <div className={classes.chatHeader}>
+            Your conversation with {chat.users.filter(_usr => _usr !== user)[0]}
+          </div>
+          <main id="chatview-container" className={classes.content}>
             {chat.messages.map((_msg, _index) => {
               return (
                 <div
@@ -34,6 +58,8 @@ class ChatView extends React.Component {
           </main>
         </div>
       );
+    } else {
+      return <main id="chatview-container" className={classes.content}></main>;
     }
   }
 }

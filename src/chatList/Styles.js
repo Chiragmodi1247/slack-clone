@@ -5,7 +5,8 @@ const styles = theme => ({
     position: "absolute",
     left: "0",
     width: '20vW',
-    boxShadow: "0px 0px 2px black"
+    boxShadow: "0px 0px 2px black",
+    overflow:"scroll"
   },
   listItem: {
     cursor: "pointer",

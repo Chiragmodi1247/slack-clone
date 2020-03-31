@@ -16,7 +16,10 @@ class Dashboard extends React.Component {
       newChatFormVisible: false,
       email: null,
       chats: [],
-      ToDoList: []
+      ToDoList: [],
+      groups: [],
+      selectedGroupIndex: null,
+      isChat: true
     };
   }
   render() {
@@ -30,15 +33,25 @@ class Dashboard extends React.Component {
           chats={this.state.chats}
           userEmail={this.state.email}
           selectedChatIndex={this.state.selectedChat}
+          groups={this.state.groups}
+          selectedGroupIndex={this.state.selectedGroupIndex}
+          selectGroupFn={this.selectGroupChat}
         ></ChatList>
         {this.state.newChatFormVisible ? null : (
           <ChatView
             user={this.state.email}
             chat={this.state.chats[this.state.selectedChat]}
+            groupChat={this.state.groups[this.state.selectedGroupIndex]}
+            isChat={this.state.isChat}
           ></ChatView>
         )}
-        <ToDoView user={this.state.email}></ToDoView>
-        {this.state.selectedChat !== null && !this.state.newChatFormVisible ? (
+        <ToDoView
+          user={this.state.email}
+          ToDoList={this.state.ToDoList}
+        ></ToDoView>
+        {(this.state.selectedChat !== null ||
+          this.state.selectedGroupIndex !== null) &&
+        !this.state.newChatFormVisible ? (
           <ChatTextBox
             messageReadFn={this.messageRead}
             submitMsgFn={this.submitMsg}
@@ -63,49 +76,83 @@ class Dashboard extends React.Component {
   };
 
   submitMsg = msg => {
-    const docKey = this.buildDocKey(
-      this.state.chats[this.state.selectedChat].users.filter(
-        _usr => _usr !== this.state.email
-      )[0]
-    );
-    firebase
-      .firestore()
-      .collection("chats")
-      .doc(docKey)
-      .update({
-        messages: firebase.firestore.FieldValue.arrayUnion({
-          message: msg,
-          sender: this.state.email,
-          timeStamp: Date.now()
-        }),
-        receiverHasRead: false
-      });
-  };
-
-  buildDocKey = friend => [this.state.email, friend].sort().join(":");
-
-  selectChat = async chatIndex => {
-    await this.setState({ selectedChat: chatIndex, newChatFormVisible: false });
-    this.messageRead();
-  };
-
-  messageRead = () => {
-    const docKey = this.buildDocKey(
-      this.state.chats[this.state.selectedChat].users.filter(
-        _usr => _usr !== this.state.email
-      )[0]
-    );
-    if (this.clickedChatWhereNotSender(this.state.selectedChat)) {
-      console.log("No sender");
+    if (this.state.isChat) {
+      const docKey = this.buildDocKey(
+        this.state.chats[this.state.selectedChat].users.filter(
+          _usr => _usr !== this.state.email
+        )[0]
+      );
       firebase
         .firestore()
         .collection("chats")
         .doc(docKey)
         .update({
-          receiverHasRead: true
+          messages: firebase.firestore.FieldValue.arrayUnion({
+            message: msg,
+            sender: this.state.email,
+            timeStamp: Date.now()
+          }),
+          receiverHasRead: false
         });
     } else {
-      console.log("User is sender");
+      console.log("Group send");
+      const docKey = this.state.groups[this.state.selectedGroupIndex].name;
+      console.log("Doc:", docKey);
+      firebase
+        .firestore()
+        .collection("groups")
+        .doc(docKey)
+        .update({
+          messages: firebase.firestore.FieldValue.arrayUnion({
+            message: msg,
+            sender: this.state.email,
+            timeStamp: Date.now()
+          }),
+        });
+    }
+  };
+
+  buildDocKey = friend => [this.state.email, friend].sort().join(":");
+
+  selectChat = async chatIndex => {
+    await this.setState({
+      selectedChat: chatIndex,
+      selectedGroupIndex: null,
+      newChatFormVisible: false,
+      isChat: true
+    });
+    this.messageRead();
+  };
+
+  selectGroupChat = async groupIndex => {
+    await this.setState({
+      selectedGroupIndex: groupIndex,
+      selectedChat: null,
+      newChatFormVisible: false,
+      isChat: false
+    });
+    // this.messageRead();
+  };
+
+  messageRead = () => {
+    if (this.state.isChat) {
+      const docKey = this.buildDocKey(
+        this.state.chats[this.state.selectedChat].users.filter(
+          _usr => _usr !== this.state.email
+        )[0]
+      );
+      if (this.clickedChatWhereNotSender(this.state.selectedChat)) {
+        console.log("No sender");
+        firebase
+          .firestore()
+          .collection("chats")
+          .doc(docKey)
+          .update({
+            receiverHasRead: true
+          });
+      } else {
+        console.log("User is sender");
+      }
     }
   };
 
@@ -122,8 +169,8 @@ class Dashboard extends React.Component {
     const usersInChat = docKey.split(":");
     const chat = this.state.chats.find(_chat =>
       usersInChat.every(_user => _chat.users.includes(_user))
-      );
-      this.setState({ newChatFormVisible: false });
+    );
+    this.setState({ newChatFormVisible: false });
     await this.selectChat(this.state.chats.indexOf(chat));
     this.submitMsg(msg);
   };
@@ -161,6 +208,28 @@ class Dashboard extends React.Component {
               email: _usr.email,
               chats: chats
             });
+          });
+        await firebase
+          .firestore()
+          .collection("groups")
+          .where("users", "array-contains", _usr.email)
+          .onSnapshot(async res => {
+            const groups = res.docs.map(_doc => _doc.data());
+            await this.setState({
+              groups: groups
+            });
+          });
+        await firebase
+          .firestore()
+          .collection("todo")
+          .where("user", "==", _usr.email)
+          .onSnapshot(async res => {
+            console.log("Called");
+            const ToDoListDoc = res.docs.map(_doc => _doc.data());
+            await this.setState({
+              ToDoList: ToDoListDoc[0].todolist
+            });
+            console.log("TODO: ", this.state);
           });
       }
     });

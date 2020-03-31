@@ -18,51 +18,67 @@ class ToDoView extends React.Component {
     super();
     this.state = {
       newToDoItem: null,
-      ToDoList: []
     };
   }
 
   render() {
-    const { classes } = this.props;
-    return (
-      <div>
-        <div className={classes.chatHeader}>Things To DO!</div>
-        <main className={classes.content}>
-          <TextField
-            className={classes.ToDoTextBox}
-            placeholder="eg: Buy milk..."
-            onKeyUp={e => this.userTyping(e)}
-            id="newToDoTextBox"
-          ></TextField>
-          <AddBox onClick={this.addItem} className={classes.addBtn}></AddBox>
-          {this.state.ToDoList.length ? (
-            <List>
-              <Typography
-                component="h3"
-                variant="h6"
-                align="center"
-                className={classes.todoheader}
-              >
-                To Do List
-              </Typography>
-              {this.state.ToDoList.map((_item, _index) => {
-                return (
-                  <div key={_index}>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText>{_item.item}</ListItemText>
-                      <Delete
-                        className={classes.delete}
-                        onClick={() => this.deleteItem(_item.item)}
-                      ></Delete>
-                    </ListItem>
-                  </div>
-                );
-              })}
-            </List>
-          ) : null}
-        </main>
-      </div>
-    );
+    const { classes, user , ToDoList } = this.props;
+    if (user === undefined) {
+      return (
+        <div>
+          <div className={classes.chatHeader}>Things To DO!</div>
+          <main className={classes.content}>
+            <TextField
+              className={classes.ToDoTextBox}
+              placeholder="eg: Buy milk..."
+              onKeyUp={e => this.userTyping(e)}
+              id="newToDoTextBox"
+            ></TextField>
+            <AddBox onClick={this.addItem} className={classes.addBtn}></AddBox>
+          </main>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <div className={classes.chatHeader}>Things To DO!</div>
+          <main className={classes.content}>
+            <TextField
+              className={classes.ToDoTextBox}
+              placeholder="eg: Buy milk..."
+              onKeyUp={e => this.userTyping(e)}
+              id="newToDoTextBox"
+            ></TextField>
+            <AddBox onClick={this.addItem} className={classes.addBtn}></AddBox>
+            {ToDoList.length ? (
+              <List>
+                <Typography
+                  component="h3"
+                  variant="h6"
+                  align="center"
+                  className={classes.todoheader}
+                >
+                  To Do List
+                </Typography>
+                {ToDoList.map((_item, _index) => {
+                  return (
+                    <div key={_index}>
+                      <ListItem className={classes.listItem}>
+                        <ListItemText>{_item.item}</ListItemText>
+                        <Delete
+                          className={classes.delete}
+                          onClick={() => this.deleteItem(_item.item)}
+                        ></Delete>
+                      </ListItem>
+                    </div>
+                  );
+                })}
+              </List>
+            ) : null}
+          </main>
+        </div>
+      );
+    }
   }
 
   userTyping = e => {
@@ -102,9 +118,9 @@ class ToDoView extends React.Component {
       });
   };
 
-  componentDidMount = () => {
-    setTimeout(this.fetchList, 2000);
-  };
+  // componentDidMount = () => {
+  //   setTimeout(this.fetchList, 4000);
+  // };
 
   fetchList = async () => {
     var user = firebase.auth().currentUser;
