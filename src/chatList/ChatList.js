@@ -97,9 +97,9 @@ class ChatList extends React.Component {
               color="primary"
               variant="contained"
               className={classes.newChatBtn}
-              onClick={this.props.newChatBtnFn}
+              onClick={this.props.newGrpBtnFn}
             >
-              Create New Channel
+              Create/Join a Channel
             </Button>
 
             {this.props.groups.length > 0 ? (
@@ -124,13 +124,17 @@ class ChatList extends React.Component {
                                 component="span"
                                 color="textSecondary"
                               >
-                            {_group.messages[
-                              _group.messages.length - 1
-                            ].message.substring(0, 25)}
-                            {_group.messages[_group.messages.length - 1].message
-                              .length > 25
-                              ? "..."
-                              : null}
+                                {_group.messages.length > 0
+                                  ? _group.messages[
+                                      _group.messages.length - 1
+                                    ].message.substring(0, 25)
+                                  : null}
+                                {_group.messages.length > 0
+                                  ? _group.messages[_group.messages.length - 1]
+                                      .message.length > 25
+                                    ? "..."
+                                    : null
+                                  : null}
                               </Typography>
                             </React.Fragment>
                           }
