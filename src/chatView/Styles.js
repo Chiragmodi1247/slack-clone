@@ -55,6 +55,7 @@ const styles = theme => ({
       clear: 'both',
       padding: '10px',
       boxSizing: 'border-box',
+      marginTop: '10px',
       wordWrap: 'break-word',
       backgroundColor: '#707BC4',
       color: 'white',
@@ -86,8 +87,15 @@ const styles = theme => ({
       color: 'white',
       paddingTop: '10px',
       boxSizing: 'border-box'
-    }
-  
+    },
+    addBtn: {
+      float:'right',
+      paddingRight:'5px',
+      cursor: "pointer",
+      "&:hover": {
+        color: "gray"
+      }
+    },  
   });
   
   export default styles;

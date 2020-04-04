@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./Styles";
 import { withStyles } from "@material-ui/core";
+import AddBox from "@material-ui/icons/AddBox";
 
 class ChatView extends React.Component {
   componentDidUpdate = () => {
@@ -13,7 +14,12 @@ class ChatView extends React.Component {
     if (groupChat !== undefined && !isChat) {
       return (
         <div>
-          <div className={classes.chatHeader}>{groupChat.name}</div>
+          <div className={classes.chatHeader}>
+          <span style={{cursor: "pointer"}} onClick={this.props.fetchMemberListFn}>
+            {groupChat.name.toUpperCase()}
+          </span>
+            <AddBox onClick={this.addUser} className={classes.addBtn}></AddBox>
+            </div>
           <main id="chatview-container" className={classes.content}>
             {groupChat.messages.map((_msg, _index) => {
               return (
@@ -62,6 +68,11 @@ class ChatView extends React.Component {
       return <main id="chatview-container" className={classes.content}></main>;
     }
   }
+
+  addUser = () => {
+      this.props.addUserFn()
+  }
+
 }
 
 export default withStyles(styles)(ChatView);

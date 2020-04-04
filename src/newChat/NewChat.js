@@ -24,69 +24,129 @@ class NewChat extends React.Component {
     };
   }
   render() {
-    const { classes } = this.props;
-    return (
-      <main className={classes.main}>
-        <CssBaseline />
-        <Paper className={classes.paper}>
-          <Typography component="h1" variant="h5">
-            Send A Message!
-          </Typography>
-          {this.state.overSmart ? (
-            <Typography
-              component="h5"
-              variant="h6"
-              className={classes.errorText}
-            >
-              Get a job in QA
+    const { classes, addingUser } = this.props;
+    if (!addingUser) {
+      return (
+        <main className={classes.main}>
+          <CssBaseline />
+          <Paper className={classes.paper}>
+            <Typography component="h1" variant="h5">
+              Send A Message!
             </Typography>
-          ) : null}
-          <form className={classes.form} onSubmit={e => this.submitNewChat(e)}>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="new-chat-username">
-                Enter Your Friend's Email
-              </InputLabel>
-              <Input
-                required
-                className={classes.input}
-                autoFocus
-                onChange={e => this.userTyping("username", e)}
-                id="new-chat-username"
-              ></Input>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="new-chat-message">
-                Enter Your Message
-              </InputLabel>
-              <Input
-                required
-                className={classes.input}
-                onChange={e => this.userTyping("message", e)}
-                id="new-chat-message"
-              ></Input>
-            </FormControl>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              type="submit"
+            {this.state.overSmart ? (
+              <Typography
+                component="h5"
+                variant="h6"
+                className={classes.errorText}
+              >
+                Get a job in QA
+              </Typography>
+            ) : null}
+            <form
+              className={classes.form}
+              onSubmit={e => this.submitNewChat(e)}
             >
-              Send
-            </Button>
-          </form>
-          {this.state.serverError ? (
-            <Typography
-              component="h5"
-              variant="h6"
-              className={classes.errorText}
-            >
-              Unable to locate the user
+              <FormControl fullWidth>
+                <InputLabel htmlFor="new-chat-username">
+                  Enter Your Friend's Email
+                </InputLabel>
+                <Input
+                  required
+                  className={classes.input}
+                  autoFocus
+                  onChange={e => this.userTyping("username", e)}
+                  id="new-chat-username"
+                ></Input>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="new-chat-message">
+                  Enter Your Message
+                </InputLabel>
+                <Input
+                  required
+                  className={classes.input}
+                  onChange={e => this.userTyping("message", e)}
+                  id="new-chat-message"
+                ></Input>
+              </FormControl>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                type="submit"
+              >
+                Send
+              </Button>
+            </form>
+            {this.state.serverError ? (
+              <Typography
+                component="h5"
+                variant="h6"
+                className={classes.errorText}
+              >
+                Unable to locate the user
+              </Typography>
+            ) : null}
+          </Paper>
+        </main>
+      );
+    } else {
+      return (
+        <main className={classes.main}>
+          <CssBaseline />
+          <Paper className={classes.paper}>
+            <Typography component="h1" variant="h5">
+              Add a user
             </Typography>
-          ) : null}
-        </Paper>
-      </main>
-    );
+            {this.state.overSmart ? (
+              <Typography
+                component="h5"
+                variant="h6"
+                className={classes.errorText}
+              >
+                Get a job in QA
+              </Typography>
+            ) : null}
+            <form
+              className={classes.form}
+              onSubmit={e => this.addNewUser(e)}
+            >
+              <FormControl fullWidth>
+                <InputLabel htmlFor="new-chat-username">
+                  Enter Your Friend's Email
+                </InputLabel>
+                <Input
+                  required
+                  className={classes.input}
+                  autoFocus
+                  onChange={e => this.userTyping("username", e)}
+                  id="new-chat-username"
+                ></Input>
+              </FormControl>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                type="submit"
+              >
+                Add
+              </Button>
+            </form>
+            {this.state.serverError ? (
+              <Typography
+                component="h5"
+                variant="h6"
+                className={classes.errorText}
+              >
+                Unable to locate the user
+              </Typography>
+            ) : null}
+          </Paper>
+        </main>
+      );
+    }
   }
 
   userTyping = (inputType, e) => {
@@ -107,14 +167,32 @@ class NewChat extends React.Component {
   submitNewChat = async e => {
     e.preventDefault();
 
-    if(this.state.username === this.props.userEmail){
-      this.setState({overSmart: true,serverError: false})
-      return
+    if (this.state.username === this.props.userEmail) {
+      this.setState({ overSmart: true, serverError: false });
+      return;
     }
     const userExists = await this.userExists();
     if (userExists) {
       const chatExists = await this.chatExists();
       chatExists ? this.goToChat() : this.createNewChat();
+    } else {
+      this.setState({ serverError: true, overSmart: false });
+    }
+  };
+
+  addNewUser = async e => {
+    e.preventDefault();
+
+    if (this.state.username === this.props.userEmail) {
+      this.setState({ overSmart: true, serverError: false });
+      return;
+    }
+    const userExists = await this.userExists();
+    if (userExists) {
+      console.log("User is exists")
+      this.props.addNewUserFn(this.state.username);
+      // const chatExists = await this.chatExists();
+      // chatExists ? this.goToChat() : this.createNewChat();
     } else {
       this.setState({ serverError: true, overSmart: false });
     }

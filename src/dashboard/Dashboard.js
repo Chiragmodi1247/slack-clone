@@ -4,7 +4,8 @@ import ChatView from "../chatView/ChatView";
 import ChatTextBox from "../chatTextBox/ChatTextBox";
 import NewChat from "../newChat/NewChat";
 import ToDoView from "../ToDoList/ToDoView";
-import NewGroup from '../newGroup/NewGroup'
+import NewGroup from "../newGroup/NewGroup";
+import MembersList from "../groupMembers/MembersList";
 
 import firebase from "firebase";
 import styles from "./Styles";
@@ -21,7 +22,11 @@ class Dashboard extends React.Component {
       groups: [],
       selectedGroupIndex: null,
       isChat: true,
-      newGroupFormVisible: false
+      newGroupFormVisible: false,
+      addUserForm: false,
+      groupIndexToAddUser: null,
+      showMembers: false,
+      MembersList: null
     };
   }
   render() {
@@ -46,12 +51,22 @@ class Dashboard extends React.Component {
             chat={this.state.chats[this.state.selectedChat]}
             groupChat={this.state.groups[this.state.selectedGroupIndex]}
             isChat={this.state.isChat}
+            addUserFn={this.addUserBtnClick}
+            fetchMemberListFn={this.fetchMemberList}
           ></ChatView>
         )}
-        <ToDoView
+        {this.state.showMembers ? (
+          <MembersList
+          MembersList={this.state.MembersList}
+          closeListFn={this.closeMemberList}
           user={this.state.email}
-          ToDoList={this.state.ToDoList}
-        ></ToDoView>
+          ></MembersList>
+        ) : (
+          <ToDoView
+            user={this.state.email}
+            ToDoList={this.state.ToDoList}
+          ></ToDoView>
+        )}
         {(this.state.selectedChat !== null ||
           this.state.selectedGroupIndex !== null) &&
         !this.state.newChatFormVisible ? (
@@ -65,14 +80,21 @@ class Dashboard extends React.Component {
             goToChatFn={this.goToChat}
             newChatSubmitFn={this.newChatSubmit}
             userEmail={this.state.email}
+            addingUser={false}
           ></NewChat>
         ) : null}
         {this.state.newGroupFormVisible ? (
           <NewGroup
-            addToExistingGroupFn={this.addToExistingGroup}
             createNewChannelFn={this.createNewChannel}
             userEmail={this.state.email}
           ></NewGroup>
+        ) : null}
+        {this.state.addUserForm ? (
+          <NewChat
+            addNewUserFn={this.addNewUserInChannel}
+            userEmail={this.state.email}
+            addingUser={true}
+          ></NewChat>
         ) : null}
         <Button onClick={this.signOut} className={classes.signOutBtn}>
           SignOut
@@ -106,7 +128,9 @@ class Dashboard extends React.Component {
         });
     } else {
       console.log("Group send");
-      const docKey = this.state.groups[this.state.selectedGroupIndex].name.toUpperCase();
+      const docKey = this.state.groups[
+        this.state.selectedGroupIndex
+      ].name.toUpperCase();
       console.log("Doc:", docKey);
       firebase
         .firestore()
@@ -117,34 +141,55 @@ class Dashboard extends React.Component {
             message: msg,
             sender: this.state.email,
             timeStamp: Date.now()
-          }),
+          })
         });
     }
   };
 
-  addToExistingGroup = (groupName) => {
-    console.log("adding you to this group in dashboard ",groupName)
-    // add user to group
-  }
+  addNewUserInChannel = async userName => {
+    console.log(
+      "adding him:",
+      userName,
+      "in",
+      this.state.groups[this.state.groupIndexToAddUser].name
+    );
+    const docKey = this.state.groups[
+      this.state.groupIndexToAddUser
+    ].name.toUpperCase();
+    await firebase
+      .firestore()
+      .collection("groups")
+      .doc(docKey)
+      .update({
+        users: firebase.firestore.FieldValue.arrayUnion(userName)
+      });
 
-  createNewChannel = async (groupName) => {
-    console.log("Creating new group: ",groupName)
-      const docKey = groupName.toUpperCase();
-      await firebase
-        .firestore()
-        .collection("groups")
-        .doc(docKey)
-        .set({
-          users: [this.state.email],
-          name: groupName,
-          messages: []
-        });
-        this.setState({ newGroupFormVisible: false });
-        const newGroup = this.state.groups.find(_group => 
-          _group.name === groupName
-          )
-        this.selectGroupChat(this.state.groups.indexOf(newGroup));
-  }
+    this.setState({
+      newChatFormVisible: false,
+      addUserForm: false,
+      newGroupFormVisible: false
+    });
+    this.selectGroupChat(this.state.groupIndexToAddUser);
+  };
+
+  createNewChannel = async groupName => {
+    console.log("Creating new group: ", groupName);
+    const docKey = groupName.toUpperCase();
+    await firebase
+      .firestore()
+      .collection("groups")
+      .doc(docKey)
+      .set({
+        users: [this.state.email],
+        name: groupName,
+        messages: []
+      });
+    this.setState({ newGroupFormVisible: false });
+    const newGroup = this.state.groups.find(
+      _group => _group.name === groupName
+    );
+    this.selectGroupChat(this.state.groups.indexOf(newGroup));
+  };
 
   buildDocKey = friend => [this.state.email, friend].sort().join(":");
 
@@ -153,7 +198,10 @@ class Dashboard extends React.Component {
       selectedChat: chatIndex,
       selectedGroupIndex: null,
       newChatFormVisible: false,
-      isChat: true
+      isChat: true,
+      addUserForm: false,
+      newGroupFormVisible: false,
+      showMembers: false
     });
     this.messageRead();
   };
@@ -164,7 +212,9 @@ class Dashboard extends React.Component {
       selectedChat: null,
       newChatFormVisible: false,
       isChat: false,
-      newGroupFormVisible: false
+      addUserForm: false,
+      newGroupFormVisible: false,
+      showMembers: false
     });
     // this.messageRead();
   };
@@ -197,20 +247,46 @@ class Dashboard extends React.Component {
     ].sender !== this.state.email;
 
   newChatBtnClick = () => {
-    this.setState({ newChatFormVisible: true, selectedChat: null, newGroupFormVisible: false });
+    this.setState({
+      newChatFormVisible: true,
+      selectedChat: null,
+      addUserForm: false,
+      newGroupFormVisible: false
+    });
   };
 
   newGrpBtnClick = () => {
-    console.log("New grp")
-    this.setState({ newGroupFormVisible: true, selectedChat: null , selectedGroupIndex: null , newChatFormVisible: false});
-  }
+    console.log("New grp");
+    this.setState({
+      newGroupFormVisible: true,
+      addUserForm: false,
+      selectedChat: null,
+      selectedGroupIndex: null,
+      newChatFormVisible: false
+    });
+  };
+
+  addUserBtnClick = () => {
+    console.log("Adding user");
+    this.setState({
+      newGroupFormVisible: false,
+      addUserForm: true,
+      selectedChat: null,
+      groupIndexToAddUser: this.state.selectedGroupIndex,
+      selectedGroupIndex: null
+    });
+  };
 
   goToChat = async (docKey, msg) => {
     const usersInChat = docKey.split(":");
     const chat = this.state.chats.find(_chat =>
       usersInChat.every(_user => _chat.users.includes(_user))
     );
-    this.setState({ newChatFormVisible: false });
+    this.setState({
+      newChatFormVisible: false,
+      addUserForm: false,
+      newGroupFormVisible: false
+    });
     await this.selectChat(this.state.chats.indexOf(chat));
     this.submitMsg(msg);
   };
@@ -231,9 +307,26 @@ class Dashboard extends React.Component {
           }
         ]
       });
-    this.setState({ newChatFormVisible: false });
+    this.setState({
+      newChatFormVisible: false,
+      addUserForm: false,
+      newGroupFormVisible: false
+    });
     this.selectChat(this.state.chats.length - 1);
   };
+
+  fetchMemberList = async () => {
+    await this.setState({
+      MembersList: this.state.groups[this.state.selectedGroupIndex].users,
+      showMembers: true
+    })
+    console.log("Fetched members::",this.state.MembersList)
+  }
+
+  closeMemberList = () => {
+    this.setState({showMembers: false})
+  }
+
   componentWillMount = () => {
     firebase.auth().onAuthStateChanged(async _usr => {
       if (!_usr) this.props.history.push("/login");

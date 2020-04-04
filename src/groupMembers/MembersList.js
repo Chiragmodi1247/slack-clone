@@ -5,70 +5,61 @@ import {
   TextField,
   List,
   ListItem,
-  ListItemText,
-  Typography
+  ListItemText
 } from "@material-ui/core";
-import AddBox from "@material-ui/icons/AddBox";
-import Delete from "@material-ui/icons/Delete";
+import CloseIcon from "@material-ui/icons/Close";
 
 import firebase from "firebase";
 
-class ToDoView extends React.Component {
+class MembersList extends React.Component {
   constructor() {
     super();
     this.state = {
-      newToDoItem: null,
+      newToDoItem: null
     };
   }
 
   render() {
-    const { classes, user , ToDoList } = this.props;
-    if (user === undefined) {
+    const { classes, MembersList } = this.props;
+    if (MembersList === undefined) {
       return (
-        <div>
-          <div className={classes.chatHeader}>Things To DO!</div>
-          <main className={classes.content}>
-            <TextField
-              className={classes.ToDoTextBox}
-              placeholder="eg: Buy milk..."
-              onKeyUp={e => this.userTyping(e)}
-              id="newToDoTextBox"
-            ></TextField>
-            <AddBox onClick={this.addItem} className={classes.addBtn}></AddBox>
-          </main>
+        <div className={classes.chatHeader}>
+          Members
+          <CloseIcon></CloseIcon>
         </div>
       );
     } else {
       return (
         <div>
-          <div className={classes.chatHeader}>Things To DO!</div>
+          <div className={classes.chatHeader}>
+            Members
+            <CloseIcon
+              onClick={this.props.closeListFn}
+              className={classes.closeBtn}
+            ></CloseIcon>
+          </div>
           <main className={classes.content}>
             <TextField
-              className={classes.ToDoTextBox}
-              placeholder="eg: Buy milk..."
+              className={classes.searchMemberBox}
+              placeholder="Search member..."
               onKeyUp={e => this.userTyping(e)}
               id="newToDoTextBox"
             ></TextField>
-            <AddBox onClick={this.addItem} className={classes.addBtn}></AddBox>
-            {ToDoList.length ? (
+            {MembersList.length ? (
               <List>
-                <Typography
-                  component="h3"
-                  variant="h6"
-                  align="center"
-                  className={classes.todoheader}
-                >
-                  To Do List
-                </Typography>
-                {ToDoList.map((_item, _index) => {
+                {MembersList.map((_item, _index) => {
                   return (
                     <div key={_index}>
                       <ListItem className={classes.listItem}>
-                        <ListItemText>{_item.item}</ListItemText>
-                        <Delete
-                          className={classes.delete}
-                          onClick={() => this.deleteItem(_item.item)}
-                        ></Delete>
+                        <ListItemText>
+                          {_item}
+                          <span style={{ color: "blue" }}>
+                            {this.props.user === _item ? "(You)" : null}
+                          </span>
+                        </ListItemText>
+                        {this.props.user === _item ? null : (
+                          <CloseIcon className={classes.delete}></CloseIcon>
+                        )}
                       </ListItem>
                     </div>
                   );
@@ -119,4 +110,4 @@ class ToDoView extends React.Component {
   };
 }
 
-export default withStyles(styles)(ToDoView);
+export default withStyles(styles)(MembersList);

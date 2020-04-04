@@ -99,7 +99,7 @@ class ChatList extends React.Component {
               className={classes.newChatBtn}
               onClick={this.props.newGrpBtnFn}
             >
-              Create/Join a Channel
+              Create a new Channel
             </Button>
 
             {this.props.groups.length > 0 ? (

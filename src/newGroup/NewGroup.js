@@ -28,10 +28,10 @@ class NewGroup extends React.Component {
         <CssBaseline />
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h5">
-            Create/Join Channel
+            Create Channel
           </Typography>
           <Typography className={classes.errorText}>
-            If group name already exists. Then you will be added to it.
+            Group name must be unique!
           </Typography>
           <form className={classes.form} onSubmit={e => this.submitNewGroup(e)}>
             <FormControl fullWidth>
@@ -53,9 +53,18 @@ class NewGroup extends React.Component {
               className={classes.submit}
               type="submit"
             >
-              Create/Join
+              Create
             </Button>
           </form>
+          {this.state.serverError ? (
+              <Typography
+                component="h5"
+                variant="h6"
+                className={classes.errorText}
+              >
+                Group already exists
+              </Typography>
+            ) : null}
         </Paper>
       </main>
     );
@@ -77,7 +86,8 @@ class NewGroup extends React.Component {
 
     const groupExists = await this.groupExists();
     if (groupExists) {
-        this.props.addToExistingGroupFn(this.state.groupName.toUpperCase());
+      this.setState({ serverError: true});
+      // this.props.addToExistingGroupFn(this.state.groupName.toUpperCase());
     //   const alreadyInGroup = await this.alreadyInGroup();
     //   alreadyInGroup ? console.log("already in grp") : console.log("Welcome to group");
     } else {
