@@ -1,9 +1,16 @@
 import React from "react";
 import styles from "./Styles";
-import { withStyles } from "@material-ui/core";
+import { withStyles, TextField } from "@material-ui/core";
 import AddBox from "@material-ui/icons/AddBox";
 
 class ChatView extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      searchTerm: ""
+    };
+  }
+
   componentDidUpdate = () => {
     const container = document.getElementById("chatview-container");
     if (container) container.scrollTo(0, container.scrollHeight);
@@ -12,16 +19,32 @@ class ChatView extends React.Component {
   render() {
     const { classes, chat, user, groupChat, isChat } = this.props;
     if (groupChat !== undefined && !isChat) {
+      let filteredGroupChat = groupChat.messages.filter(chat => {
+        return (
+          chat.message
+            .toLowerCase()
+            .indexOf(this.state.searchTerm.toLowerCase()) !== -1
+        );
+      });
       return (
         <div>
           <div className={classes.chatHeader}>
-          <span style={{cursor: "pointer"}} onClick={this.props.fetchMemberListFn}>
-            {groupChat.name.toUpperCase()}
-          </span>
+            <span
+              style={{ cursor: "pointer" }}
+              onClick={this.props.fetchMemberListFn}
+            >
+              {groupChat.name.toUpperCase()}
+            </span>
             <AddBox onClick={this.addUser} className={classes.addBtn}></AddBox>
-            </div>
+          </div>
           <main id="chatview-container" className={classes.content}>
-            {groupChat.messages.map((_msg, _index) => {
+          <TextField
+              className={classes.searchMsgBox}
+              placeholder="Search Message..."
+              onKeyUp={e => this.userTyping(e)}
+              id="newToDoTextBox"
+            ></TextField>
+            {filteredGroupChat.map((_msg, _index) => {
               return (
                 <div key={_index}>
                   {_msg.sender === user ? null : (
@@ -70,9 +93,12 @@ class ChatView extends React.Component {
   }
 
   addUser = () => {
-      this.props.addUserFn()
-  }
+    this.props.addUserFn();
+  };
 
+  userTyping = e => {
+    this.setState({ searchTerm: e.target.value });
+  };
 }
 
 export default withStyles(styles)(ChatView);

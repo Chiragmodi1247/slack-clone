@@ -60,6 +60,7 @@ class Dashboard extends React.Component {
           MembersList={this.state.MembersList}
           closeListFn={this.closeMemberList}
           user={this.state.email}
+          removeMemberFn={this.removeMember}
           ></MembersList>
         ) : (
           <ToDoView
@@ -147,12 +148,6 @@ class Dashboard extends React.Component {
   };
 
   addNewUserInChannel = async userName => {
-    console.log(
-      "adding him:",
-      userName,
-      "in",
-      this.state.groups[this.state.groupIndexToAddUser].name
-    );
     const docKey = this.state.groups[
       this.state.groupIndexToAddUser
     ].name.toUpperCase();
@@ -325,6 +320,22 @@ class Dashboard extends React.Component {
 
   closeMemberList = () => {
     this.setState({showMembers: false})
+  }
+
+  removeMember = async (memberName) => {
+    console.log("Member:",memberName)
+    const docKey = this.state.groups[this.state.selectedGroupIndex].name.toUpperCase();
+    await firebase
+      .firestore()
+      .collection("groups")
+      .doc(docKey)
+      .update({
+        users: firebase.firestore.FieldValue.arrayRemove(memberName)
+      });
+      await this.setState({
+        MembersList: this.state.groups[this.state.selectedGroupIndex].users
+      })        
+
   }
 
   componentWillMount = () => {

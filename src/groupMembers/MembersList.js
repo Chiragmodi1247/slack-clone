@@ -9,13 +9,11 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
-import firebase from "firebase";
-
 class MembersList extends React.Component {
   constructor() {
     super();
     this.state = {
-      newToDoItem: null
+      searchTerm: ''
     };
   }
 
@@ -29,7 +27,12 @@ class MembersList extends React.Component {
         </div>
       );
     } else {
-      return (
+      let filteredMembersList = MembersList.filter(
+          (member) => {
+            return member.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) !== -1;
+          }
+        )
+          return (
         <div>
           <div className={classes.chatHeader}>
             Members
@@ -45,9 +48,9 @@ class MembersList extends React.Component {
               onKeyUp={e => this.userTyping(e)}
               id="newToDoTextBox"
             ></TextField>
-            {MembersList.length ? (
+            {filteredMembersList.length ? (
               <List>
-                {MembersList.map((_item, _index) => {
+                {filteredMembersList.map((_item, _index) => {
                   return (
                     <div key={_index}>
                       <ListItem className={classes.listItem}>
@@ -58,7 +61,7 @@ class MembersList extends React.Component {
                           </span>
                         </ListItemText>
                         {this.props.user === _item ? null : (
-                          <CloseIcon className={classes.delete}></CloseIcon>
+                          <CloseIcon className={classes.delete} onClick={ () => this.props.removeMemberFn(_item)}></CloseIcon>
                         )}
                       </ListItem>
                     </div>
@@ -73,41 +76,9 @@ class MembersList extends React.Component {
   }
 
   userTyping = e => {
-    e.keyCode === 13
-      ? this.addItem()
-      : this.setState({ newToDoItem: e.target.value });
+      this.setState({ searchTerm: e.target.value });
   };
 
-  msgValid = txt => txt && txt.replace(/\s/g, "").length;
-
-  addItem = () => {
-    if (this.msgValid(this.state.newToDoItem)) {
-      document.getElementById("newToDoTextBox").value = "";
-
-      firebase
-        .firestore()
-        .collection("todo")
-        .doc(this.props.user)
-        .update({
-          todolist: firebase.firestore.FieldValue.arrayUnion({
-            item: this.state.newToDoItem
-          })
-        });
-
-      console.log("Submit");
-    }
-  };
-  deleteItem = _item => {
-    firebase
-      .firestore()
-      .collection("todo")
-      .doc(this.props.user)
-      .update({
-        todolist: firebase.firestore.FieldValue.arrayRemove({
-          item: _item
-        })
-      });
-  };
 }
 
 export default withStyles(styles)(MembersList);
