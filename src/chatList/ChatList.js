@@ -11,6 +11,7 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import NotificationImportant from "@material-ui/icons/NotificationImportant";
+import AddBox from "@material-ui/icons/AddBox";
 
 class ChatList extends React.Component {
   render() {
@@ -18,33 +19,41 @@ class ChatList extends React.Component {
     if (this.props.chats.length > 0) {
       return (
         <main className={classes.root}>
-          <Typography component="h3" variant="h6" align="center">
-            Direct Messages
-          </Typography>
-          <Button
-            fullWidth
-            color="primary"
-            variant="contained"
-            className={classes.newChatBtn}
-            onClick={this.props.newChatBtnFn}
-          >
-            Start a new chat
-          </Button>
+            <Typography component="h3" variant="h6" display='inline' align="center" className={classes.title}>
+              Direct Messages
+            </Typography>
+            <AddBox onClick={this.props.newChatBtnFn} className={classes.addBtn}></AddBox>
           <List>
             {this.props.chats.map((_chat, _index) => {
+              const colors = ["#D32F2F", "#388E3C", "#FFA000"];
+              const number = Math.floor(Math.random() * 3);
+              const curr = colors[number];
+
               return (
                 <div key={_index}>
                   <ListItem
                     onClick={() => this.selectChat(_index)}
-                    className={classes.listItem}
-                    selected={this.props.selectedChatIndex === _index}
+                    className={
+                      this.props.selectedChatIndex === _index
+                        ? classes.selectedChat
+                        : classes.listItem
+                    }
                     alignItems="flex-start"
                   >
                     <ListItemAvatar>
-                      <Avatar alt="remy">
+                      <Avatar
+                        alt="remy"
+                        style={{
+                          backgroundColor: "white",
+                          color: curr,
+                          fontWeight: "bold",
+                        }}
+                      >
                         {
                           _chat.users
-                            .filter(_user => _user !== this.props.userEmail)[0]
+                            .filter(
+                              (_user) => _user !== this.props.userEmail
+                            )[0]
                             .split("")[0]
                         }
                       </Avatar>
@@ -52,7 +61,7 @@ class ChatList extends React.Component {
                     <ListItemText
                       primary={
                         _chat.users.filter(
-                          _user => _user !== this.props.userEmail
+                          (_user) => _user !== this.props.userEmail
                         )[0]
                       }
                       secondary={
@@ -84,37 +93,39 @@ class ChatList extends React.Component {
             })}
           </List>
           <main>
-            <Typography
-              style={{ backgroundColor: "red", color: "white" }}
-              component="h3"
-              variant="h6"
-              align="center"
-            >
+          <Typography component="h3" variant="h6" display='inline' align="center" className={classes.title}>
               Channels
             </Typography>
-            <Button
-              fullWidth
-              color="primary"
-              variant="contained"
-              className={classes.newChatBtn}
-              onClick={this.props.newGrpBtnFn}
-            >
-              Create a new Channel
-            </Button>
+            <AddBox onClick={this.props.newGrpBtnFn} className={classes.addBtn}></AddBox>
 
             {this.props.groups.length > 0 ? (
               <List>
                 {this.props.groups.map((_group, _index) => {
+                  const colors = ["#D32F2F", "#388E3C", "#FFA000"];
+                  const number = Math.floor(Math.random() * 3);
+                  const curr = colors[number];
                   return (
                     <div key={_index}>
                       <ListItem
                         onClick={() => this.selectGroupChat(_index)}
-                        className={classes.listItem}
-                        selected={this.props.selectedGroupIndex === _index}
+                        className={
+                          this.props.selectedGroupIndex === _index
+                            ? classes.selectedChat
+                            : classes.listItem
+                        }
                         alignItems="flex-start"
                       >
                         <ListItemAvatar>
-                          <Avatar alt="remy">{_group.name.split("")[0]}</Avatar>
+                          <Avatar
+                            alt="remy"
+                            style={{
+                              backgroundColor: "white",
+                              color: curr,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {_group.name.split("")[0]}
+                          </Avatar>
                         </ListItemAvatar>
                         <ListItemText
                           primary={_group.name}
@@ -176,13 +187,13 @@ class ChatList extends React.Component {
   newChat = () => {
     console.log("New chat");
   };
-  selectChat = chatIndex => {
+  selectChat = (chatIndex) => {
     this.props.selectChatFn(chatIndex);
   };
-  selectGroupChat = groupChatIndex => {
+  selectGroupChat = (groupChatIndex) => {
     this.props.selectGroupFn(groupChatIndex);
   };
-  userIsSender = chat =>
+  userIsSender = (chat) =>
     chat.messages[chat.messages.length - 1].sender === this.props.userEmail;
 }
 

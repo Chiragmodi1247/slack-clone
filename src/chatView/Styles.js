@@ -1,14 +1,15 @@
 const styles = theme => ({
   content: {
-    height: "calc(100vh - 100px)",
+    height: "calc(100vh - 90px)",
     overflow: "auto",
     padding: "5px",
     marginLeft: "20vW",
     boxSizing: "border-box",
     overflowY: "scroll",
-    top: "50px",
+    top: "42px",
     width: "60vW",
-    position: "absolute"
+    position: "absolute",
+    backgroundColor: '#fafafa'
   },
 
   userSent: {
@@ -18,8 +19,7 @@ const styles = theme => ({
     boxSizing: "border-box",
     wordWrap: "break-word",
     marginTop: "10px",
-    backgroundColor: "#707BC4",
-    color: "white",
+    backgroundColor: "#e0e0e0",
     width: "300px",
     borderRadius: "10px"
   },
@@ -37,8 +37,7 @@ const styles = theme => ({
     padding: "10px",
     boxSizing: "border-box",
     wordWrap: "break-word",
-    backgroundColor: "#707BC4",
-    color: "white",
+    backgroundColor: "#e0e0e0",
     width: "300px",
     borderRadius: "10px"
   },
@@ -56,7 +55,7 @@ const styles = theme => ({
     boxSizing: "border-box",
     marginTop: "10px",
     wordWrap: "break-word",
-    backgroundColor: "#707BC4",
+    backgroundColor: "#303F9F",
     color: "white",
     width: "300px",
     borderRadius: "10px"
@@ -69,7 +68,7 @@ const styles = theme => ({
     boxSizing: "border-box",
     wordWrap: "break-word",
     marginTop: "10px",
-    backgroundColor: "#707BC4",
+    backgroundColor: "#303F9F",
     color: "white",
     width: "300px",
     borderRadius: "10px"
@@ -77,19 +76,21 @@ const styles = theme => ({
 
   chatHeader: {
     width: "60vW",
-    height: "50px",
-    backgroundColor: "#344195",
+    height: "42px",
+    backgroundColor: "#eeeeee",
     position: "fixed",
     marginLeft: "20vW",
     fontSize: "18px",
-    textAlign: "center",
-    color: "white",
     paddingTop: "10px",
+    paddingLeft: '20px',
+    fontWeight: 'bold',
     boxSizing: "border-box"
   },
 
   searchMsgBox: {
     float: "right",
+    bottom: '5px',
+    width: '20vw'
   },
 
   addBtn: {

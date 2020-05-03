@@ -1,18 +1,18 @@
 const styles = theme => ({
   content: {
-    height: "calc(100% - 50px)",
-    backgroundColor:"#F5F5F5",
+    height: "calc(100% - 42px)",
+    backgroundColor:"#1976D2",
     overflow: "auto",
     padding: "5px",
     marginLeft: "80vW",
     boxSizing: "border-box",
     overflowY: "scroll",
-    top: "50px",
+    top: "42px",
     width: "20vW",
     position: "absolute"
   },
   addBtn: {
-    color: "blue",
+    color: "white",
     cursor: "pointer",
     "&:hover": {
       color: "gray"
@@ -26,20 +26,22 @@ const styles = theme => ({
     padding: '5px',
     marginTop: '10px',
     borderRadius: '10px',
-    border: '1px solid black'
+    border: '1px solid black',
+    color: 'white',
+    backgroundColor: '#1a237e'
   },
   todoheader: {
     marginTop: '10px'
   },
 
   ToDoTextBox: {
-    width: "17vW"
+    width: "17vW",
   },
 
   chatHeader: {
     width: "20vW",
-    height: "50px",
-    backgroundColor: "#8BC34A",
+    height: "42px",
+    backgroundColor: "#303F9F",
     position: "fixed",
     marginLeft: "80vW",
     fontSize: "18px",

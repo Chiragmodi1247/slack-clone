@@ -36,14 +36,14 @@ class ChatView extends React.Component {
               {groupChat.name.toUpperCase()}
             </span>
             <AddBox onClick={this.addUser} className={classes.addBtn}></AddBox>
-          </div>
-          <main id="chatview-container" className={classes.content}>
-          <TextField
+            <TextField
               className={classes.searchMsgBox}
               placeholder="Search Message..."
               onKeyUp={e => this.userTyping(e)}
               id="newToDoTextBox"
             ></TextField>
+          </div>
+          <main id="chatview-container" className={classes.content}>
             {filteredGroupChat.map((_msg, _index) => {
               return (
                 <div key={_index}>
@@ -69,7 +69,7 @@ class ChatView extends React.Component {
       return (
         <div>
           <div className={classes.chatHeader}>
-            Your conversation with {chat.users.filter(_usr => _usr !== user)[0]}
+            {chat.users.filter(_usr => _usr !== user)[0]}
           </div>
           <main id="chatview-container" className={classes.content}>
             {chat.messages.map((_msg, _index) => {
