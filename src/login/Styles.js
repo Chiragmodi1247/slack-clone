@@ -24,6 +24,17 @@ const styles = theme => ({
     submit: {
       marginTop: theme.spacing() * 3,
     },
+    testDiv: {
+      display: 'grid',
+      gridTemplateColumns: '3fr 1fr'
+    },
+    testDivText: {
+      textAlign: 'center',
+      color: '#146500'
+    },
+    test: {
+      backgroundColor: '#2b787b'
+    },
     noAccountHeader: {
       width: '100%'
     },
@@ -36,6 +47,12 @@ const styles = theme => ({
     errorText: {
       color: 'red',
       textAlign: 'center'
+    },
+    infoText: {
+      color: 'blue',
+      textAlign: 'center',
+      fontSize: '1rem',
+      fontWeight: 'bold'
     }
   });
   

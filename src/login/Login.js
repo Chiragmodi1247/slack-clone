@@ -30,7 +30,6 @@ class Login extends React.Component {
           <Typography component="h1" variant="h5">
             Login
           </Typography>
-           <span className={classes.errorText}>*All previous user are deleted, so you might have to create a new</span>
           <form onSubmit={e => this.handleSubmit(e)} className={classes.form}>
             <FormControl required fullWidth margin="normal">
               <InputLabel htmlFor="login-email-input">
@@ -76,6 +75,23 @@ class Login extends React.Component {
               Create one
             </Link>
           </Typography>
+
+          <br />
+          <br />
+
+          <div className={classes.testDiv}>
+          <Typography className={classes.testDivText}>
+            Are you a recruiter? Just want to test the site?
+          </Typography>
+          <Button
+              variant="contained"
+              color="primary"
+              className={classes.test}
+              onClick={this.testTheSite}
+            >
+              Yes
+            </Button>
+          </div>
         </Paper>
       </main>
     );
@@ -94,6 +110,20 @@ class Login extends React.Component {
     }
   };
 
+  testTheSite = () => {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword('test@slack.com', 'test123')
+      .then(
+        () => {
+          this.props.history.push("/");
+        },
+        err => {
+          this.setState({ loginError: true });
+        }
+      );
+  }
+
   handleSubmit = e => {
     e.preventDefault();
     firebase
@@ -105,7 +135,6 @@ class Login extends React.Component {
         },
         err => {
           this.setState({ loginError: true });
-          console.log("Login error: " + err);
         }
       );
   };

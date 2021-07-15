@@ -1,7 +1,7 @@
 const styles = theme => ({
   content: {
     height: "calc(100% - 42px)",
-    backgroundColor:"#1976D2",
+    backgroundColor:"#F5F5F5",
     overflow: "auto",
     padding: "5px",
     marginLeft: "80vW",
@@ -12,7 +12,7 @@ const styles = theme => ({
     position: "absolute"
   },
   addBtn: {
-    color: "white",
+    color: "blue",
     cursor: "pointer",
     "&:hover": {
       color: "gray"
